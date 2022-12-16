@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -141,7 +142,8 @@ func buildHTMLId(idAbbreviation, chapter, verseNum string) string {
 
 func main() {
 
-	input := "John 3:16"
+	args := os.Args[1:]
+	input := strings.Join(args, " ")
 	book, chapter, verseNum := parseQuery(input)
 
 	books := booksInfo()
@@ -160,6 +162,6 @@ func main() {
 
 	tag := getElementById(doc, id)
 	verse := getVerse(tag)
-	fmt.Println(verse)
+	fmt.Println(verse[0])
 
 }
