@@ -75,7 +75,6 @@ func getVerse(n *html.Node) []string {
 			// get the data in between the italics tag with FirstChild
 			// then continue on to get the rest of the data in b tag, which is
 			// in NextSibling.Data
-
 			verse = append(verse, c.FirstChild.Data)
 			// append the rest of the b tag
 			verse = append(verse, c.NextSibling.Data)

@@ -37,6 +37,8 @@ var getCmd = &cobra.Command{
 
 		tag := getElementById(doc, id)
 		verse := getVerse(tag)
-		fmt.Println(verse[0])
+		finalVerse := strings.Join(verse, "")
+
+		fmt.Println(finalVerse)
 	},
 }
