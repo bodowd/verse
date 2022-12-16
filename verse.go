@@ -66,10 +66,8 @@ func getElementById(n *html.Node, id string) *html.Node {
 }
 
 func getVerse(n *html.Node) []string {
-	fmt.Println(renderNode(n))
 	var verse []string
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		fmt.Println(c.Data)
 		if c.Data == "b" {
 			verse = append(verse, c.NextSibling.Data)
 		} else if c.Data == "i" {
@@ -130,29 +128,38 @@ func parseQuery(query string) (string, string, string) {
 	return book.String(), chapter.String(), verse.String()
 }
 
+func buildURL(bookNumber, bookName, chapter string) string {
+	// ...bookNumber_fullName_Chapter.htm
+	URL := fmt.Sprintf("https://text.recoveryversion.bible/%s_%s_%s.htm", bookNumber, bookName, chapter)
+
+	return URL
+}
+
+func buildHTMLId(idAbbreviation, chapter, verseNum string) string {
+	return idAbbreviation + chapter + "-" + verseNum
+}
+
 func main() {
 
 	input := "John 3:16"
 	book, chapter, verseNum := parseQuery(input)
-	fmt.Printf("book %s, chapter %s, verse %s", book, chapter, verseNum)
 
-	// url := "https://text.recoveryversion.bible/01_Genesis_1.htm"
-	// url := "https://text.recoveryversion.bible/11_1Kings_1.htm"
-	// url := "https://text.recoveryversion.bible/11_1Kings_8.htm"
-	url := "https://text.recoveryversion.bible/62_1John_1.htm"
-	// bookNumber_Book_Chapter.htm
+	books := booksInfo()
+	bookMapping := books[book]
+
+	url := buildURL(bookMapping.bookNumber, bookMapping.fullName, chapter)
+
 	page := getHTML(url)
 
 	doc, err := html.Parse(strings.NewReader(page))
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tag := getElementById(doc, "FJo1-2")
+	id := buildHTMLId(bookMapping.idAbbreviation, chapter, verseNum)
+
+	tag := getElementById(doc, id)
 	verse := getVerse(tag)
 	fmt.Println(verse)
 
-	bookNumbers := getBookNumbers()
-	fmt.Println(bookNumbers)
 }
