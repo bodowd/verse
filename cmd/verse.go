@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"bytes"
@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -138,30 +137,4 @@ func buildURL(bookNumber, bookName, chapter string) string {
 
 func buildHTMLId(idAbbreviation, chapter, verseNum string) string {
 	return idAbbreviation + chapter + "-" + verseNum
-}
-
-func main() {
-
-	args := os.Args[1:]
-	input := strings.Join(args, " ")
-	book, chapter, verseNum := parseQuery(input)
-
-	books := booksInfo()
-	bookMapping := books[book]
-
-	url := buildURL(bookMapping.bookNumber, bookMapping.fullName, chapter)
-
-	page := getHTML(url)
-
-	doc, err := html.Parse(strings.NewReader(page))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id := buildHTMLId(bookMapping.idAbbreviation, chapter, verseNum)
-
-	tag := getElementById(doc, id)
-	verse := getVerse(tag)
-	fmt.Println(verse[0])
-
 }
