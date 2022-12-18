@@ -81,4 +81,11 @@ func TestGetVerse(t *testing.T) {
 		want := "Blessed is the man / Who does not walk / In the counsel of the wicked, / Nor stand on the path of sinners, / Nor sit in the seat of mockers;"
 		assertStringsEqual(t, got, want)
 	})
+
+	t.Run("returns verse not found if the verse cannot be found", func(t *testing.T) {
+		verse := testCaseToVerse("gen_test_case.html", "Gen1-32")
+		got := cleanStrings(verse)
+		want := "Verse cannot be found."
+		assertStringsEqual(t, got, want)
+	})
 }

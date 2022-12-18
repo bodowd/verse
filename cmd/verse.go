@@ -66,6 +66,9 @@ func getElementById(n *html.Node, id string) *html.Node {
 }
 
 func getVerse(n *html.Node) []string {
+	if n == nil {
+		return []string{"Verse cannot be found."}
+	}
 	// starts at node n which is the <p> containing the id we are interested in
 	var verse []string
 
