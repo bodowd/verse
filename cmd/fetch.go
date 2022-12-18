@@ -13,6 +13,13 @@ func init() {
 	rootCmd.AddCommand(getCmd)
 }
 
+func cleanStrings(verse []string) string {
+	// remove new lines and double spaces in the string
+	finalVerse := strings.ReplaceAll(strings.ReplaceAll(strings.Join(verse, ""), "\n", ""), "  ", " ")
+	return finalVerse
+
+}
+
 var getCmd = &cobra.Command{
 	Use:   "get",
 	Short: "get verse",
@@ -35,9 +42,9 @@ var getCmd = &cobra.Command{
 
 		id := buildHTMLId(bookMapping.idAbbreviation, chapter, verseNum)
 
-		tag := getElementById(doc, id)
-		verse := getVerse(tag)
-		finalVerse := strings.Join(verse, "")
+		element := getElementById(doc, id)
+		verse := getVerse(element)
+		finalVerse := cleanStrings(verse)
 
 		fmt.Println(finalVerse)
 	},
