@@ -66,18 +66,64 @@ func getElementById(n *html.Node, id string) *html.Node {
 }
 
 func getVerse(n *html.Node) []string {
+	// starts at node n which is the <p> containing the id we are interested in
 	var verse []string
+
+	// FirstChild of n is <b>
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		if c.Data == "b" {
-			verse = append(verse, c.NextSibling.Data)
+			// the FirstChild of <b> is the <a> tags
+			// the Next sibling of <b> could contain a verse or <span>
+			// the c.NextSibling.NextSibling could contain "i" which we check
+			// in the next else if
+			if c.NextSibling.Data != "span" {
+				verse = append(verse, c.NextSibling.Data)
+			}
 		} else if c.Data == "i" {
 			// sometimes there's an italics in the middle of the verse
-			// get the data in between the italics tag with FirstChild
+			// get the word inbetween the <i> tag is the First Child
 			// then continue on to get the rest of the data in b tag, which is
 			// in NextSibling.Data
 			verse = append(verse, c.FirstChild.Data)
 			// append the rest of the b tag
 			verse = append(verse, c.NextSibling.Data)
+			// then the next iteration will happen which will go to c.NextSibling
+			// which could be another <i> tag which we will then go back into
+			// this code block. This will end when c.NextSibling.NextSibling == nil
+			// which will end the for loop
+		} else if c.Data == "span" {
+			// the FirstChild will contain the first block of text in the first
+			// <span>
+			verse = append(verse, c.FirstChild.Data)
+			// The next <span> blocks are Nextsiblings of FirstChild
+			// i.e. c.FirstChild.NextSibling == <span>
+			// so c.FirstChild.NextSibling.FirstChild contains the next text
+			// within that next <span>
+			// i.e. c.FirstChild.NextSibling.FirstChild == text
+
+			// the pattern seems to be FirstChild.NextSibling => text in one <span>
+			// then FirstChild.NextSibling.FirstChild.NextSibling => the next
+			// text in the following <span>
+
+			// the loop needs to be different for the <span>.
+			// in the first hit of "span", it gives the whole block.
+			// there is no NextSibling. I.e. c.NextSibling == nil
+			// So from the text of this current node (the FirstChild of the current <span>)
+			// we need to go to the NextSibling of the text (the NextSibling of FirstChild)
+			// this will contain the next <span>
+
+			// <span current>
+			//  First Child -- text
+			//      <span Next Sibling>
+			//          First Child -- text
+			//          <span NextSibling>
+			//              First Child -- text
+			//          </span>
+			//      </span>
+			// </span>
+			for c := c.FirstChild.NextSibling; c != nil; c = c.FirstChild.NextSibling {
+				verse = append(verse, c.FirstChild.Data)
+			}
 		}
 
 	}
