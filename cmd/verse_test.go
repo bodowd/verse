@@ -88,4 +88,19 @@ func TestGetVerse(t *testing.T) {
 		want := "Verse cannot be found."
 		assertStringsEqual(t, got, want)
 	})
+
+	t.Run("successfully gets verse in spans when there are italics in the middle", func(t *testing.T) {
+		verse := testCaseToVerse("sos_test_case.html", "Son7-12")
+		got := cleanStrings(verse)
+		want := "Let us rise up early for the vineyards; / Let us see if the vine has budded, / If the blossom is open, / If the pomegranates are in bloom; / There I will give you my love."
+		assertStringsEqual(t, got, want)
+	})
+
+	t.Run("another Song of Songs test", func(t *testing.T) {
+		verse := testCaseToVerse("sos_test_case.html", "Son7-13")
+		got := cleanStrings(verse)
+		want := "The mandrakes give forth fragrance, / And over our doors are all choice fruits, / New as well as old. / These, my beloved, I have stored up for you."
+		assertStringsEqual(t, got, want)
+	})
+
 }

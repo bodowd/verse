@@ -95,44 +95,68 @@ func getVerse(n *html.Node) []string {
 			// this code block. This will end when c.NextSibling.NextSibling == nil
 			// which will end the for loop
 		} else if c.Data == "span" {
-			// the FirstChild will contain the first block of text in the first
-			// <span>
-			verse = append(verse, c.FirstChild.Data)
-			// The next <span> blocks are Nextsiblings of FirstChild
-			// i.e. c.FirstChild.NextSibling == <span>
-			// so c.FirstChild.NextSibling.FirstChild contains the next text
-			// within that next <span>
-			// i.e. c.FirstChild.NextSibling.FirstChild == text
-
-			// the pattern seems to be FirstChild.NextSibling => text in one <span>
-			// then FirstChild.NextSibling.FirstChild.NextSibling => the next
-			// text in the following <span>
-
-			// the loop needs to be different for the <span>.
-			// in the first hit of "span", it gives the whole block.
-			// there is no NextSibling. I.e. c.NextSibling == nil
-			// So from the text of this current node (the FirstChild of the current <span>)
-			// we need to go to the NextSibling of the text (the NextSibling of FirstChild)
-			// this will contain the next <span>
-
-			// <span current>
-			//  First Child -- text
-			//      <span Next Sibling>
-			//          First Child -- text
-			//          <span NextSibling>
-			//              First Child -- text
-			//          </span>
-			//      </span>
-			// </span>
-			for c := c.FirstChild.NextSibling; c != nil; c = c.FirstChild.NextSibling {
-				verse = append(verse, c.FirstChild.Data)
-			}
+			verse = traverseNestedSpans(c, verse)
 		}
+	}
+	return verse
+}
+
+// the FirstChild will contain the first block of text in the first
+// <span>
+//
+// The next <span> blocks are Nextsiblings of FirstChild
+// i.e. c.FirstChild.NextSibling == <span>
+//
+// so c.FirstChild.NextSibling.FirstChild contains the next text
+// within that next <span>
+//
+// i.e. c.FirstChild.NextSibling.FirstChild == text
+//
+// the pattern seems to be FirstChild.NextSibling => text in one <span>
+// then FirstChild.NextSibling.FirstChild.NextSibling => the next
+// text in the following <span>
+//
+// the loop needs to be different for the <span>.
+//
+// in the first hit of "span", it gives the whole block.
+// there is no NextSibling. I.e. c.NextSibling == nil
+//
+// So from the text of this current node (the FirstChild of the current <span>)
+// we need to go to the NextSibling of the text (the NextSibling of FirstChild)
+// this will contain the next <span>
+//
+//	<span current>
+//		First Child -- text
+//		    <span Next Sibling>
+//		        First Child -- text
+//		        <span NextSibling>
+//		            First Child -- text
+//		        </span>
+//		    </span></span>
+func traverseNestedSpans(c *html.Node, verse []string) []string {
+
+	if c.Data == "span" {
+		// append text that is under the span
+		verse = append(verse, c.FirstChild.Data)
 
 	}
 
-	return verse
+	// then traverse nested elements
+	for c := c.FirstChild.NextSibling; c != nil; c = c.FirstChild.NextSibling {
 
+		verse = append(verse, c.FirstChild.Data)
+		if c.Data == "i" {
+			// append the rest of the span tag similar to how we handle
+			// italics in the getVerse if "i" conditional
+			verse = append(verse, c.NextSibling.Data)
+			if c.NextSibling.NextSibling != nil {
+				//  Then traverse the next span
+				verse = traverseNestedSpans(c.NextSibling.NextSibling, verse)
+
+			}
+		}
+	}
+	return verse
 }
 
 func renderNode(n *html.Node) string {
