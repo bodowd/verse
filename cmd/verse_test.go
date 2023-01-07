@@ -103,4 +103,12 @@ func TestGetVerse(t *testing.T) {
 		assertStringsEqual(t, got, want)
 	})
 
+	t.Run("successfully gets verse in spans when the verse ends with italics", func(t *testing.T) {
+		verse := testCaseToVerse("sos_test_case_Ch8.html", "Son8-13")
+		got := cleanStrings(verse)
+		got = strings.ReplaceAll(got, "  ", "")
+		want := "O you who dwell in the gardens, / My companions listen for your voice; / Let me hear it."
+		assertStringsEqual(t, got, want)
+	})
+
 }

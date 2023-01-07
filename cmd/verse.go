@@ -146,13 +146,15 @@ func traverseNestedSpans(c *html.Node, verse []string) []string {
 
 		verse = append(verse, c.FirstChild.Data)
 		if c.Data == "i" {
-			// append the rest of the span tag similar to how we handle
-			// italics in the getVerse if "i" conditional
-			verse = append(verse, c.NextSibling.Data)
-			if c.NextSibling.NextSibling != nil {
-				//  Then traverse the next span
-				verse = traverseNestedSpans(c.NextSibling.NextSibling, verse)
-
+			// if the verse ends with an italics tag, there is no NextSibling
+			if c.NextSibling != nil {
+				// append the rest of the span tag similar to how we handle
+				// italics in the getVerse if "i" conditional
+				verse = append(verse, c.NextSibling.Data)
+				if c.NextSibling.NextSibling != nil {
+					//  Then traverse the next span
+					verse = traverseNestedSpans(c.NextSibling.NextSibling, verse)
+				}
 			}
 		}
 	}
